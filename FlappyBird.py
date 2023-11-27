@@ -1,20 +1,21 @@
 import pygame
 import os
 import random
+
 TELA_LARGURA = 500
 TELA_ALTURA = 800
 
-IMGEM_CANO = pygame.image.load(os.path.join('imgs', 'pipe.png'))
-IMAGEM_CHAO = pygame.image.load(os.path.join('imgs', 'base.png'))
-IMAGEM_BACKGROUND = pygame.image.load(os.path.join('imgs', 'bg.png'))
+IMGEM_CANO = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'pipe.png')))
+IMAGEM_CHAO = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'base.png')))
+IMAGEM_BACKGROUND = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bg.png')))
 IMAGENS_PASSARO = [
-    pygame.image.load(os.path.join('imgs', 'bird1.png')),
-    pygame.image.load(os.path.join('imgs', 'bird2.png')),
-    pygame.image.load(os.path.join('imgs', 'bird3.png'))
+    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird1.png'))),
+    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird2.png'))),
+    pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'bird3.png')))
 ]
 
 pygame.font.init()
-FONTE_PONTOS = pygame.font.SysFont("arial", 50)
+FONTE_PONTOS = pygame.font.SysFont('arial', 40)
 
 class Passaro:
     IMGS = IMAGENS_PASSARO
@@ -82,30 +83,30 @@ class Passaro:
 
          # desenhar a imagem 
         imagem_rotacionada = pygame.transform.rotate(self.imagem, self.angulo )
-        pos_centro_imagem = self.imagem.get_rect(topleft = (self.y, self.y)).center
+        pos_centro_imagem = self.imagem.get_rect(topleft = (self.x, self.y)).center
         retangulo = imagem_rotacionada.get_rect(center = pos_centro_imagem)
-        tela.blit(imagem_rotacionada,retangulo.topleft)
+        tela.blit(imagem_rotacionada, retangulo.topleft)
 
-        def get_mask(self):
-            pygame.mask.from_surface(self.imagem)
+    def get_mask(self):
+        return pygame.mask.from_surface(self.imagem)
 
 class Cano:
     DISTANCIA = 200
     VELOCIDADE = 5
 
-    def __init__(self,x) -> None:
+    def __init__(self, x):
         self.x = x
         self.altura = 0
         self.pos_topo = 0
         self.pos_base = 0
-        self.CANO_TOPO = pygame.transform.flip(IMGEM_CANO, True, True)
+        self.CANO_TOPO = pygame.transform.flip(IMGEM_CANO, False, True)
         self.CANO_BASE = IMGEM_CANO
         self.passou = False
         self.definir_altura()
 
     def definir_altura(self):
         self.altura = random.randrange(50, 450)
-        self.pos_base = self.altura - self.CANO_TOPO.get_height()
+        self.pos_topo = self.altura - self.CANO_TOPO.get_height()
         self.pos_base = self.altura + self.DISTANCIA
 
     def mover(self):
@@ -128,6 +129,8 @@ class Cano:
 
         if base_ponto or topo_ponto:
             return True
+            pygame.quit()
+            quit()
         else:
             return False
 
@@ -137,7 +140,7 @@ class Chao:
     LARGURA = IMAGEM_CHAO.get_width()
     IMAGEM = IMAGEM_CHAO
 
-    def __init__(self, y) -> None:
+    def __init__(self, y):
         self.y = y
         self.x1 = 0
         self.x2 = self.LARGURA
@@ -147,9 +150,9 @@ class Chao:
         self.x2 -= self.VELOCIDADE
 
         if self.x1 + self.LARGURA < 0:
-            self.x1 = self.x1 + self.LARGURA
+            self.x1 = self.x2 + self.LARGURA
         if self.x2 + self.LARGURA < 0:
-            self.x2 = self.x2 + self.LARGURA
+            self.x2 = self.x1 + self.LARGURA
         
     def desenhar(self, tela):
         tela.blit(self.IMAGEM, (self.x1, self.y))
@@ -185,10 +188,11 @@ def main():
             if evento.type == pygame.QUIT:
                 rodando = False
                 pygame.quit()
+                quit()
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_SPACE:
                     for passaro in passaros:
-                        passaro.Pular()
+                        passaro.pular()
 
 #Mover as coisas
         for passaro in passaros:
